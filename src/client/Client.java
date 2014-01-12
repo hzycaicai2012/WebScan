@@ -23,7 +23,9 @@ import java.util.logging.Logger;
 import databasesource.DatabaseSource;
 import databasesource.DatabaseSourceDriver;
 import databasesource.DatabaseSourceDriverFactory;
+import databasesource.MysqlDatabaseSourceDriver;
 import datachecker.DataChecker;
+import dataobject.CheckResult;
 import dataobject.ScanPlan;
 
 /**
@@ -41,7 +43,7 @@ public class Client implements Observer{
 	protected DatabaseSourceDriver databaseSourceDriver = null;
 	protected DatabaseSource databaseSource = null;
 	protected int poolSize = 10;
-	protected ExecutorService pool = Executors.newFixedThreadPool(2);
+	protected ExecutorService pool = Executors.newFixedThreadPool(10);
 	
 	
 	private Client(){
@@ -66,6 +68,7 @@ public class Client implements Observer{
 				System.out.println("plan"+scanPlan.getId()+" "+scanPlan.getWebSite());
 				filename = "D:\\WebScan\\"+scanPlan.getId()+df.format(new Date())+".xml";
 				DataChecker check = new DataChecker(scanPlan,filename);
+				check.addObserver(this);
 				Thread thread = new Thread(check);
 				//thread.start();
 				this.pool.execute(thread);
@@ -74,6 +77,7 @@ public class Client implements Observer{
 			}
 		}
 		pool.shutdown();
+		
 	}
 	
 	public void shutdown(){
@@ -82,8 +86,20 @@ public class Client implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if(arg!=null){
-			System.out.println("Get notification from "+((ScanPlan)arg).getId()+" "+((ScanPlan)arg).getWebSite()+" status is:"+((ScanPlan)arg).getEndIbm());
+		if(arg instanceof ScanPlan){
+			int Id = ((ScanPlan)arg).getId();
+			int status = ((ScanPlan)arg).getEndIbm();
+			System.out.println("Notification from Thread"+Id+" to change status to:"+status);
+			databaseSourceDriver.updateScanPlan(Id,status);
 		}
+		else if(arg instanceof ArrayList<?>){
+			System.out.println("Notification of ArrayList");
+			ArrayList<CheckResult> resList = ((ArrayList<CheckResult>)arg);
+			for(Iterator<CheckResult> it = resList.iterator();it.hasNext();){
+				CheckResult res = it.next();
+				System.out.println(res.getName()+" "+res.getRisk());
+				databaseSource.writeCheckRes(res);
+			}
+		}	
 	}
 }

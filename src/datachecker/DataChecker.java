@@ -13,6 +13,7 @@ import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import util.SimpleXMLAnalyser;
 import util.XMLAnalyser;
 import dataobject.ScanPlan;
 
@@ -45,11 +46,16 @@ public class DataChecker extends Observable implements Runnable{
 									plan.getWebSite()+" /report_file "+this.fileName+" /report_type xml";
 				Process proc = run.exec(str);
 				int exitVal = proc.waitFor();
-				XMLAnalyser analyser = new XMLAnalyser(fileName);
-				if(exitVal<0)
+				//System.out.println("exitVal:"+exitVal);
+				if(exitVal<0){
 					notifyRes(-1);
-				else
+				}
+				else{
+					XMLAnalyser analyser = new SimpleXMLAnalyser(plan.getId(),plan.getSysId(),this.fileName);
 					notifyRes(2);
+					this.setChanged();
+					this.notifyObservers(analyser.analyse());
+				}
 			} catch(Exception ex){
 				notifyRes(-1);
 				logger.log(Level.SEVERE, "run cmd error:",ex);

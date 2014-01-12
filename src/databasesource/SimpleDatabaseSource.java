@@ -53,6 +53,7 @@ public class SimpleDatabaseSource extends DatabaseSource {
 						+ " (SCANPLAN_ID, FName, FsecurityRisk, Fcause, Ftext, FtestDescription, FWASC, FCVE, FCWE, FfixRecommendation, FSeverity, SYS_ID)"
 						+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			}
+			//writeConn.setAutoCommit(false);
 			writeCheckResPstmt.setInt(1, res.getScanPlanId());
 			writeCheckResPstmt.setString(2, res.getName());
 			writeCheckResPstmt.setString(3, res.getRisk());
@@ -65,11 +66,13 @@ public class SimpleDatabaseSource extends DatabaseSource {
 			writeCheckResPstmt.setString(10, res.getRecommend());
 			writeCheckResPstmt.setString(11, res.getSeverity());
 			writeCheckResPstmt.setInt(12, res.getSysId());
-			writeCheckResPstmt.addBatch();
-            batchCount++;
-            if (batchCount >= maxBatch) {
-                commit();
-            }
+			writeCheckResPstmt.execute();
+			//writeConn.commit();
+			//writeCheckResPstmt.addBatch();
+           // batchCount++;
+            //if (batchCount >= maxBatch) {
+             //   commit();
+            //}
 		} catch(SQLException ex) {
             logger.log(Level.SEVERE, "write check result:", ex);
         }

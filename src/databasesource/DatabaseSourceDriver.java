@@ -16,4 +16,5 @@ package databasesource;
  */
 public abstract class DatabaseSourceDriver {
 	public abstract DatabaseSource getNewDatabaseSource();
+	public abstract void updateScanPlan(int fid, int status);
 }

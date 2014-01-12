@@ -16,7 +16,7 @@ package dataobject;
  */
 public class CheckResult {
 
-	private int status = 0;
+	private int status = -1;
 	private int scanPlanId;
 	private String name = null;
 	private String risk = null;
