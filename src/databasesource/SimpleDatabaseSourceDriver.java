@@ -112,4 +112,11 @@ public class SimpleDatabaseSourceDriver extends DatabaseSourceDriver {
         }
 		return null;
 	}
+
+	@Override
+	public void updateScanPlan(ArrayList<Integer> list) {
+		//To be done
+	}
+	
+	
 }

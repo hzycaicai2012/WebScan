@@ -52,11 +52,19 @@ public class SimpleXMLAnalyser extends XMLAnalyser{
 	}
 	
 	
-	public ArrayList<CheckResult> analyse(){
+	/*
+	 * @see util.XMLAnalyser#analyse()
+	 * Analyze the XML file and may throw exceptions for string index out of bounds
+	 * Use regex expressions to match the content and get the check result
+	 */
+	public ArrayList<CheckResult> analyse() throws Exception{
 		String content = getFileContent();
 		checkResList = new ArrayList<CheckResult>();
 		if(content!=null){
-			content = content.substring(content.indexOf("<IssueTypes>"), content.indexOf("</IssueTypes>"));
+			int start = content.indexOf("<IssueTypes>");
+			int end = content.indexOf("</IssueTypes>");
+			//if(start>=0&&end>=0&&start<end){
+			content = content.substring(start, end);
 			if(content!=null){
 				String[] seg = content.split("</IssueType>");
 				String temp;
@@ -119,11 +127,15 @@ public class SimpleXMLAnalyser extends XMLAnalyser{
 		return null;
 	}
 	
+	/*
+	 * read the file and get the content in the XML file
+	 */
 	private String getFileContent(){
 		if(fileName!=null){
 			BufferedReader reader = null;
 			String content = null;
 			try{
+				//for Chinese, using the encoding UTF-8
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),"UTF-8"));
 				String temp = null;
 				while((temp = reader.readLine())!=null){
@@ -138,6 +150,9 @@ public class SimpleXMLAnalyser extends XMLAnalyser{
 		return null;
 	}
 	
+	/*
+	 * method for regex expression match
+	 */
 	private String match(String regex, String content){
 		Pattern p = Pattern.compile(regex);
 		Matcher matcher = p.matcher(content);
@@ -147,6 +162,9 @@ public class SimpleXMLAnalyser extends XMLAnalyser{
 		return null;
 	}
 	
+	/*
+	 * method for regex expression replace
+	 */
 	private String replace(String regex, String replace, String content){
 		if(content!=null&&regex!=null){
 			Pattern p = Pattern.compile(regex);

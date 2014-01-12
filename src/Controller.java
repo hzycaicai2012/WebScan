@@ -16,10 +16,12 @@ import client.Client;
  * @version  	 
  */
 public class Controller {
-
+	/*
+	 * GUI to be added~
+	 */
 	public static void main(String[] args) {
-		Client client = Client.getClient();
-		client.start();
+		Client client = new Client();
+		client.start(); 
 	}
 
 }

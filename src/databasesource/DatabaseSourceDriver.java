@@ -8,6 +8,9 @@
 */
 
 package databasesource;
+
+import java.util.ArrayList;
+
 /**
  * ClassName:DatabaseSourceDriver
  * 
@@ -16,5 +19,13 @@ package databasesource;
  */
 public abstract class DatabaseSourceDriver {
 	public abstract DatabaseSource getNewDatabaseSource();
+	/*
+	 * update the status of the items in the prefetch database
+	 */
 	public abstract void updateScanPlan(int fid, int status);
+	/*
+	 * update the items in status 1 while not appear in checkresult database.
+	 */
+	public abstract void updateScanPlan(ArrayList<Integer> list);
+	
 }

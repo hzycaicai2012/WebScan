@@ -20,6 +20,5 @@ import dataobject.CheckResult;
  * @version  	 
  */
 public abstract class XMLAnalyser {
-	public abstract ArrayList<CheckResult> analyse();
-
+	public abstract ArrayList<CheckResult> analyse() throws Exception;
 }

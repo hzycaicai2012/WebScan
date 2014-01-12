@@ -11,6 +11,7 @@ package databasesource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -40,11 +41,21 @@ public class SimpleDatabaseSource extends DatabaseSource {
 		this.writeConn = conn;
 	}
 	
+	/*
+	 * @see databasesource.DatabaseSource#getScanPlanList()
+	 * return the scanPlanList
+	 */
 	@Override
 	public ArrayList<ScanPlan> getScanPlanList() {
 		return this.scanPlanList;
 	}
 
+	/*
+	 * @see databasesource.DatabaseSource#writeCheckRes(dataobject.CheckResult)
+	 * write back the check result
+	 * for test, just write back right now
+	 * for use, need add each statement to the batch and commit together
+	 */
 	@Override
 	public void writeCheckRes(CheckResult res) {
 		try{
@@ -53,7 +64,6 @@ public class SimpleDatabaseSource extends DatabaseSource {
 						+ " (SCANPLAN_ID, FName, FsecurityRisk, Fcause, Ftext, FtestDescription, FWASC, FCVE, FCWE, FfixRecommendation, FSeverity, SYS_ID)"
 						+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			}
-			//writeConn.setAutoCommit(false);
 			writeCheckResPstmt.setInt(1, res.getScanPlanId());
 			writeCheckResPstmt.setString(2, res.getName());
 			writeCheckResPstmt.setString(3, res.getRisk());
@@ -126,5 +136,28 @@ public class SimpleDatabaseSource extends DatabaseSource {
 			writeCheckResPstmt.executeBatch();
 		}
 		batchCount = 0;
+	}
+
+	/*
+	 * @see databasesource.DatabaseSource#getScannedList()
+	 * get the distinct id, which indicate the items has finished
+	 * this method is for the client.reset()
+	 */
+	@Override
+	public ArrayList<Integer> getScannedList() {
+		try{
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			PreparedStatement pstmt = writeConn.prepareStatement("select distinct SCANPLAN_ID from tb_checkresult");
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()){
+				list.add(rs.getInt(1));
+			}
+	        rs.close();
+	        pstmt.close();
+	        return list;
+		} catch(SQLException ex) {
+            logger.log(Level.SEVERE, "write check result:", ex);
+        }
+		return null;
 	}
 }

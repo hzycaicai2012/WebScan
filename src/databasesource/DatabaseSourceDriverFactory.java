@@ -30,6 +30,9 @@ public class DatabaseSourceDriverFactory {
 	
 	private static Logger logger = Logger.getLogger(DatabaseSourceDriverFactory.class.getName());
 	
+	/*
+	 * get databaseSourceDriver for sqlite~
+	 */
 	public static DatabaseSourceDriver getDatabaseSourceDriver(){
 		 try{
 			 Class.forName(prefetchDriverClassName);
@@ -40,11 +43,14 @@ public class DatabaseSourceDriverFactory {
 		 }
 		 return null;
 	}
+	/*
+	 * get databaseSourceDriver for mysql~
+	 */
 	public static DatabaseSourceDriver getDatabaseSourceDriver(String userName, String passWd){
 		try{
 			 Class.forName(prefetchDriverClassName);
 			 Class.forName(writeDriverClassName);
-			 System.out.print("get mysql source Driver~");
+			 //System.out.print("get mysql source Driver~");
 			 return new MysqlDatabaseSourceDriver(prefetchConnectionString, writeConnectionString, userName, passWd);
 		 } catch(Exception ex){
 			 logger.log(Level.SEVERE, "get database source:", ex);

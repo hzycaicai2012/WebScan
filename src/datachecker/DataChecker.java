@@ -21,16 +21,15 @@ import dataobject.ScanPlan;
  * ClassName:DataChecker
  *
  * @author   hzycaicai
- * @version  	 
  */
+
 public class DataChecker extends Observable implements Runnable{
 	private static Logger logger = Logger.getLogger(DataChecker.class.getName());
-	//private DatabaseSource databaseSource = null;
 	
 	private ScanPlan plan = null;
 	private String fileName = null;
 
-	public DataChecker(ScanPlan plan, String fileName/*, DatabaseSource databaseSource*/){
+	public DataChecker(ScanPlan plan, String fileName){
 		this.plan = plan;
 		this.fileName = fileName;
 		//this.databaseSource = databaseSource;
@@ -44,20 +43,22 @@ public class DataChecker extends Observable implements Runnable{
 			try{
 				String str = "D:\\Program Files\\IBM\\AppScan Standard\\AppScanCMD.exe exec /starting_url "+
 									plan.getWebSite()+" /report_file "+this.fileName+" /report_type xml";
-				Process proc = run.exec(str);
-				int exitVal = proc.waitFor();
-				//System.out.println("exitVal:"+exitVal);
+				Process proc = run.exec(str);    					//create a native process execute the command line
+				int exitVal = proc.waitFor();    					//wait for the process terminated
+				
 				if(exitVal<0){
-					notifyRes(-1);
+					notifyRes(0);                					//abnormal exit, notify the client to recover the status to 0
 				}
 				else{
-					XMLAnalyser analyser = new SimpleXMLAnalyser(plan.getId(),plan.getSysId(),this.fileName);
-					notifyRes(2);
+					notifyRes(2);               					//normal exit, notify the client to set the status to 2
+					//XMLAnalyser analyser = new SimpleXMLAnalyser(plan.getId(),plan.getSysId(),this.fileName);
+					//Analyze the XML file, for test just analyze the fixed file
+					XMLAnalyser analyser = new SimpleXMLAnalyser(plan.getId(),plan.getSysId(),"D:\\software\\20140104.xml");
 					this.setChanged();
-					this.notifyObservers(analyser.analyse());
+					this.notifyObservers(analyser.analyse());   	//notify the client with check result list
 				}
 			} catch(Exception ex){
-				notifyRes(-1);
+				notifyRes(0);
 				logger.log(Level.SEVERE, "run cmd error:",ex);
 			}
 			System.out.println("Thread"+plan.getId()+" is exiting:"+plan.getWebSite());
